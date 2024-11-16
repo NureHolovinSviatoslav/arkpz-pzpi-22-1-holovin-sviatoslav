@@ -1,1 +1,469 @@
-﻿
+﻿Харківський університет радіоелектроніки
+Факультет комп'ютерних наук
+Кафедра програмної інженерії
+
+
+
+
+
+
+
+
+
+
+ЗВІТ
+до лабораторної роботи з дисципліни
+"Аналіз та рефакторинг коду"
+на тему: "РОЗРОБКА БІЗНЕС-ЛОГІКИ ТА ФУНКЦІЙ АДМІНІСТРУВАННЯ СЕРВЕРНОЇ ЧАСТИНИ ПРОГРАМНОЇ СИСТЕМИ"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Виконав ст. гр. ПЗПІ-22-1
+Головін Святослав Юрійович
+
+
+Перевірив
+Сокорчук Ігор Петрович
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Харків 2024 р.
+1 МЕТА
+
+
+Розробити бізнес-логіку та функції адміністрування серверної частини програмної системи.
+
+
+2 ХІД РОБОТИ
+
+
+1. Розробка бізнес-логіки серверної частини програмної системи.
+        Бізнес-логіка системи буде містити:
+* нотифікація користувачів через мобільний клієнти про нетипові показники сенсорів IoT;
+* нотифікація користувачів через мобільний клієнти про відсутність запасів на складі;
+* створення звітів про запаси вакцин та показники сенсорів IoT;
+* авторизація та аутентифікація запитів.
+
+
+        Бізнес-логіка та загальна діяльність серверної частини представлена на рисунку 1.1.
+
+
+  
+
+Рисунок 1.1 - UML діаграма діяльності для серверної частини
+
+
+        Те як система буде взаємодіяти в цілому, представлено на рисунку 1.2.
+
+
+  
+
+Рисунок 1.2 - UML діаграма взаємодії для серверної частини
+
+
+2. Розробити функції адміністрування серверної частини програмної системи.
+        Функції адміністрування серверної частини будуть містити:
+* можливість створення будь-якої сутності в системі;
+* можливість отримання будь-якої сутності в системі;
+* можливість отримання списку будь-яких сутностей в системі;
+* можливість змінювати сутності, які є доцільними для цього(всі, окрім записів з сенсорів, сповіщень користувача);
+* можливість видаляти сутності, які є доцільними для цього(всі, окрім записів з сенсорів, сповіщень користувача).
+
+
+3. Створити програмну реалізацію бізнес-логіки та функцій адміністрування серверної частини.
+
+
+        Використовуючи технології Node.js, фреймворк Express.js та підготовані на минулій лабораторній роботі моделі в форматі Sequalize, розробимо типові CRUD шлях, які будуть використовуватися для функцій адміністрування системою. Так для кожної моделі будуть типові 5 шляхів: Створити, Змінити, Отримати всі, Отримати один, Видалити. Приклад таких шляхів для моделі Vaccine:
+
+
+'use strict';
+
+
+const { InventoryItem } = require('../models/InventoryItem');
+const { OrderItem } = require('../models/OrderItem');
+const { Vaccine } = require('../models/Vaccine');
+const express = require('express');
+const { createAuthMiddleware } = require('../services/createAuthMiddleware');
+const { roles } = require('../services/roles');
+
+
+const router = express.Router();
+
+
+const getAll = async (req, res) => {
+  try {
+    const vaccines = await Vaccine.findAll();
+    res.send(vaccines);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+
+const getOne = async (req, res) => {
+  const { id } = req.params;
+
+
+  try {
+    const vaccine = await Vaccine.findByPk(parseInt(id));
+    if (!vaccine) {
+      return res.status(404).send('Vaccine not found');
+    }
+    res.send(vaccine);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+
+const add = async (req, res) => {
+  const vaccineData = { ...req.body };
+
+
+  try {
+    const vaccine = await Vaccine.create(vaccineData);
+    res.status(201).send(vaccine);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+
+const update = async (req, res) => {
+  const { id } = req.params;
+  const vaccineData = { ...req.body };
+
+
+  try {
+    await Vaccine.update(vaccineData, {
+      where: { vaccine_id: parseInt(id) },
+    });
+    const vaccine = await Vaccine.findByPk(parseInt(id));
+    if (!vaccine) {
+      return res.status(404).send('Vaccine not found');
+    }
+    res.send(vaccine);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+
+const remove = async (req, res) => {
+  const { id } = req.params;
+
+
+  try {
+    await InventoryItem.destroy({ where: { vaccine_id: parseInt(id) } });
+    await OrderItem.destroy({ where: { vaccine_id: parseInt(id) } });
+    const deleted = await Vaccine.destroy({
+      where: { vaccine_id: parseInt(id) },
+    });
+    if (!deleted) {
+      return res.status(404).send('Vaccine not found');
+    }
+    res.status(204).send({});
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+
+router.get('/', ...createAuthMiddleware([roles.STAFF, roles.ADMIN]), getAll);
+router.get('/:id', ...createAuthMiddleware([roles.STAFF, roles.ADMIN]), getOne);
+router.post('/', ...createAuthMiddleware([roles.STAFF, roles.ADMIN]), add);
+router.patch(
+  '/:id',
+  ...createAuthMiddleware([roles.STAFF, roles.ADMIN]),
+  update,
+);
+router.delete(
+  '/:id',
+  ...createAuthMiddleware([roles.STAFF, roles.ADMIN]),
+  remove,
+);
+
+
+module.exports = { router };
+
+
+Створивши всі функції адміністрування, можемо перейти до бізнес-логіки, в першу чергу це авторизація та аутентифікація, які були зроблені у вигляді middleware, яку зручно застосовувати й кастомізувати під кожен шлях додатку.
+        Так маємо middleware для перевірки аутентифікації користувача в системі:
+
+
+const jwtLib = require('jsonwebtoken');
+
+
+function jwt(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // 'Bearer TOKEN'
+
+
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: 'Access token is missing or invalid' });
+  }
+
+
+  jwtLib.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: 'Token verification failed' });
+    }
+
+
+    req.user = user;
+    next();
+  });
+}
+
+
+module.exports = { jwt };
+
+
+Та middleware для перевірки авторизації користувача:
+
+
+function createAuthMiddleware(roles) {
+  return [
+    jwt,
+    (req, res, next) => {
+      const user = req.user;
+
+
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      if (!user.role || !roles.includes(user.role)) {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
+
+
+      next();
+    },
+  ];
+}
+
+
+Також є окремий випадок, для дій, що користувач може виконувати з самим собою, але не іншими користувачами:
+
+
+const { jwt } = require('./jwt');
+
+
+function createSelfMiddleware() {
+  return [
+    jwt,
+    (req, res, next) => {
+      const user = req.user;
+      const { username } = req.params;
+
+
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      if (username !== user.username && user.role !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
+
+
+      next();
+    },
+  ];
+}
+
+
+module.exports = { createSelfMiddleware };
+
+
+Працює ця система на JSON WebToken системі, що перевіряє чи є в заголовку спеціальний токен, котрий клієнт отримує при логіні в систему, а система авторизації базується на фіксованих ролях під кожного користувача. Також в процесі реєстрації є хешування паролю для безпеки.
+Приклад шляху для логіну:
+
+
+const login = async (req, res) => {
+  const { username, password } = req.body;
+
+
+  try {
+    const user = await User.findByPk(username);
+
+
+    if (!user || user.password_hash !== hashString(password).toString()) {
+      return res.status(401).send('Invalid username or password');
+    }
+
+
+    const accessToken = jwtLib.sign(
+      {
+        username: user.username,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '1h',
+      },
+    );
+
+
+    res.json({ accessToken });
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+
+        Наступною частиною функціоналу бізнес-логіки буде створення звітів для обраної локації. Функціонально сервер буде повертати дані про кількість кожної вакцини, яка зберігається в обраній локації, які поточні показники температури та вологості для цієї локації.
+Код шляху для генерування звітів:
+
+
+const getReport = async (req, res) => {
+  const { id } = req.params;
+
+
+  try {
+    const location = await Location.findByPk(parseInt(id));
+    if (!location) {
+      return res.status(404).send('Location not found');
+    }
+
+
+    const inventories = await Inventory.findAll({
+      where: { location_id: parseInt(id) },
+    });
+    const inventoryItems = await Promise.all(
+      inventories.map(async (inventory) => {
+        const itemWithVaccine = await InventoryItem.findAll({
+          where: { inventory_id: inventory.inventory_id },
+          include: Vaccine,
+        });
+
+
+        return {
+          inventory_id: inventory.inventory_id,
+          max_quantity: inventory.max_quantity,
+          used_quantity: itemWithVaccine.reduce(
+            (acc, item) => acc + item.quantity,
+            0,
+          ),
+          stored_vaccines: itemWithVaccine.map((item) => ({
+            vaccine_id: item.vaccine_id,
+            name: item.vaccine.name,
+            description: item.vaccine.description,
+            quantity: item.quantity,
+          })),
+        };
+      }),
+    );
+
+
+    res.send({
+      location_id: location.location_id,
+      name: location.name,
+      address: location.address,
+      inventories: inventoryItems,
+    });
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+
+        Наступною частиною є автоматична система сповіщень, якщо вакцини в складському приміщенні закінчились або якщо показники з сенсорів IoT виходять за рамки норми. Для реалізації сповіщень використано безкоштовну версію сервісу Twilo, який дозволяє відправляти повідомлення на номер телефону WhatsApp. Відправляти повідомлення будемо, за необхідності, після створення показника з сенсора IoT або після зміни запасів у складі.
+Приклад сповіщення для сенсора IoT:
+
+
+const add = async (req, res) => {
+  const data = { ...req.body };
+
+
+  try {
+    const sensorData = await SensorData.create(data);
+
+
+    const error = await checkSensorData(sensorData.sensor_data_id);
+
+
+    if (error) {
+      sendSms(formatAlertMessage(error));
+    }
+
+
+    res.status(201).send(sensorData);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+
+Приклад інтеграції з Twilio:
+
+
+const sendSms = async (data) => {
+  try {
+    await clientTwilio.messages.create({
+      body: data.message,
+      to: `whatsapp:${process.env.DEFAULT_PHONE || data.phone}`,
+      from: 'whatsapp:+14155238886',
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+Якщо ми отримаємо від сенсора не дійсне значення, то на вказаний номер прийде повідомлення, що представлено на рисунку 1.
+
+
+  
+
+Рисунок 1 - Сповіщення про критичний стан системи
+
+
+За аналогією імплементуємо повідомлення про статус запасів.
+
+
+4. Тестування системи
+        Записуємо змістовне відео з тестуванням бізнес-логіки та функцій адміністрування серверної частини системи, проставляємо таймкоди та завантажуємо на сервіс YouTube. Посилання на відео: https://youtu.be/w-unqqZjiCA.
+________________
+ВИСНОВКИ
+
+
+        У ході виконання роботи було розроблено бізнес-логіку та функції адміністрування серверної частини програмної системи.

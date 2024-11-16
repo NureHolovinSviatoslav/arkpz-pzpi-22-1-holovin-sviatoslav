@@ -4,6 +4,8 @@ const { SensorData } = require('../models/SensorData');
 const express = require('express');
 const { createAuthMiddleware } = require('../services/createAuthMiddleware');
 const { roles } = require('../services/roles');
+const { checkSensorData } = require('../services/checkSensorData');
+const { sendSms, formatAlertMessage } = require('../services/sendSms');
 
 const router = express.Router();
 
@@ -35,6 +37,12 @@ const add = async (req, res) => {
 
   try {
     const sensorData = await SensorData.create(data);
+
+    const error = await checkSensorData(sensorData.sensor_data_id);
+    if (error) {
+      sendSms(formatAlertMessage(error));
+    }
+
     res.status(201).send(sensorData);
   } catch (err) {
     res.status(400).send(err.message);

@@ -12,6 +12,7 @@ const User = sequelize.define(
     },
     password_hash: Sequelize.STRING,
     role: Sequelize.STRING,
+    phone: Sequelize.STRING,
   },
   {
     tableName: 'user',

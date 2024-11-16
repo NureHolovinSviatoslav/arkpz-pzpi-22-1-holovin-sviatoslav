@@ -47,6 +47,17 @@ const update = async (req, res) => {
   const inventoryData = { ...req.body };
 
   try {
+    const inventoryItems = await InventoryItem.findAll({
+      where: { inventory_id: parseInt(id) },
+    });
+
+    if (
+      inventoryData.max_quantity <
+      inventoryItems.reduce((acc, item) => acc + item.quantity, 0)
+    ) {
+      return res.status(412).send('Max quantity exceeded');
+    }
+
     await Inventory.update(inventoryData, {
       where: { inventory_id: parseInt(id) },
     });

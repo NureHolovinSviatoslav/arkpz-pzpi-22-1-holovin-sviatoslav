@@ -13,6 +13,7 @@ const Location = sequelize.define(
     },
     name: Sequelize.STRING,
     address: Sequelize.STRING,
+    responsible_user_phone: Sequelize.STRING,
   },
   {
     tableName: 'location',

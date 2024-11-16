@@ -1,3 +1,9 @@
+# Report generation
+
+```bash
+curl -X GET http://localhost:3000/locations/2/report
+```
+
 # With auth
 
 ```bash
