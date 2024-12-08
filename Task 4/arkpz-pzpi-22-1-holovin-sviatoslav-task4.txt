@@ -1,0 +1,437 @@
+﻿Харківський університет радіоелектроніки
+Факультет комп'ютерних наук
+Кафедра програмної інженерії
+
+
+
+
+
+
+
+
+
+
+ЗВІТ
+до лабораторної роботи з дисципліни
+"Аналіз та рефакторинг коду"
+на тему: "РОЗРОБКА IoT КЛІЄНТА 
+(БІЗНЕС-ЛОГІКИ ТА ФУНКЦІЙ НАЛАШТУВАННЯ)"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Виконав ст. гр. ПЗПІ-22-1
+Головін Святослав Юрійович
+
+
+Перевірив
+Сокорчук Ігор Петрович
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Харків 2024 р.
+1 МЕТА
+
+
+Розробити бізнес-логіку та функції налаштування для IoT клієнта програмної системи.
+
+
+2 ХІД РОБОТИ
+
+
+1. Розробка будови програмного забезпечення ІоТ клієнта.
+Опишемо архітектуру програмного забезпечення ІоТ клієнта на базі Arduino ESP32, який виконує функції входу в систему, вимірювання навколишніх параметрів температури та вологості, регулярної передачі цих даних у віддалену систему та сигналізації про низький рівень заряду.
+
+
+Основні модулі та компоненти:
+* Модуль налаштувань:
+   * Завдання:
+      * Завантаження та зберігання початкових налаштувань з флеш-пам’яті ESP32. Список налаштувань: логін, пароль, location_id, інтервали оновлення;
+   * Функціональність:
+      * Функції loadConfig() та saveConfig();
+      * Структура даних Config з полями: username, password, location_id, measurement_interval, server_url, wifi_ssid, wifi_password;
+* Модуль зв’язку з мережею:
+   * Завдання:
+      * підключення до Wi-Fi за наданими параметрами;
+      * Виконання HTTP/HTTPS запитів до сервера для: аутентифікації, відправки виміряних даних;
+   * Функціональність:
+      * connectWiFi() - встановлення Wi-Fi з’єднання;
+      * loginToServer(username, password) - надсилання запиту на вхід і отримання токена авторизації;
+      * postData(token, location_id, temp, humidity) - відправлення даних на сервер;
+* Модуль датчиків:
+   * Завдання:
+      * Зчитування даних з датчика вологості та температури за заданим інтервалом;
+   * Функціональність:
+      * readTemperature() - повертає поточну температуру;
+      * readHumidity() - повертає поточну вологість;
+* Модуль живлення та моніторингу батареї:
+   * Завдання:
+      * Періодичне зчитування рівня батареї;
+      * Звукова сигналізація про низький рівень батареї;
+   * Функціональність:
+      * readBatteryLevel() - повертає відсотковий рівень заряду;
+      * Якщо battery_level < threshold - викликати triggerLowBatteryAlert();
+      * triggerLowBatteryAlert() буде вмикати звуковий сигнал;
+* Модуль логіки додатку:
+   * Завдання:
+      * Ініціалізація всіх модулів;
+      * Логін на сервер при старті або при оновленні токена;
+      * Циклічне виконання основних операцій:
+         * Зчитування датчиків;
+         * Перевірка рівня батареї;
+         * Надсилання даних на сервер;
+   * Функціональність:
+      * setup() - викликається один раз при старті:
+         * Завантаження конфігурації;
+         * Підключення до Wi-Fi;
+         * Логін на сервер, отримання токена;
+         * Ініціалізація датчиків;
+      * loop() – основний цикл:
+         * Перевірка часу з останньої відправки даних;
+         * Якщо настав час, зчитати temp, humidity;
+         * Надіслати дані на сервер;
+         * Перевірити battery_level;
+         * Якщо батарея низька - подати сигнал;
+         * Затримка до наступної ітерації;
+Потік виконання
+* Старт пристрою:
+   * setup() викликається при старті або перезапуску:
+      * Завантаження конфігурації з EEPROM (loadConfig());
+      * Підключення до Wi-Fi (connectWiFi());
+      * Виконання loginToServer(username, password) для отримання токена авторизації;
+      * Ініціалізація датчиків;
+   * Основний цикл loop():
+      * Через measurement_interval секунд:
+         * Зчитування температури та вологості (readTemperature(), readHumidity());
+         * Виклик postData(token, location_id, temp, humidity, battery_level) для відправки даних на сервер;
+         * Перевірка рівня батареї (readBatteryLevel());
+         * Якщо рівень нижче порогу - triggerLowBatteryAlert();
+Структура файлів:
+* main.ino;
+* Config.h / Config.cpp
+* Network.h / Network.cpp
+* Sensors.h / Sensors.cpp
+* Battery.h / Battery.cpp
+
+
+2. Створення UML діаграми прецедентів для ІоТ клієнта.
+        На основі розробленої будови, створемо UML діаграму прецедентів. Діаграма представлена на рисунку 1.
+
+
+  
+
+Рисунок 1 - UML діаграма прецедентів для ІоТ клієнта
+
+
+3. Розробка бізнес-логіки та функцій налаштування ІоТ клієнта.
+        Бізнес-логіка:
+* При старті пристрій завантажує конфігурацію (логін, пароль, location_id, інтервали вимірювань, параметри підключення до Wi-Fi та URL сервера);
+* Підключається до Wi-Fi та виконує аутентифікацію на сервері, отримуючи токен доступу;
+* Згідно з конфігурацією, зчитує температуру, вологість та рівень заряду з датчиків з певним інтервалом;
+* Після зчитування, відправляє виміряні дані на віддалений сервер;
+* Контролює рівень заряду батареї та сигналізує при низькому рівні;
+Функції налаштування:
+* loadConfig() - завантажує збережені параметри логін, пароль, location_id, інтервал вимірювань, Wi-Fi SSID/пароль, URL сервера з флеш-пам’яті;
+
+
+4. Створення діаграми діяльності для ІоТ клієнта.
+        На основі бізнес-логіки розробимо діаграму діяльності для ІоТ клієнта. Діаграма представлена на рисунку 2.
+
+
+  
+
+Рисунок 2 - Діаграма діяльності для ІоТ клієнта
+5. Створення програмної реалізації бізнес-логіки та функцій налаштування ІоТ клієнта.
+
+
+        Використовуючи технологію Arduino та сайт емулятор wokwi.com, розробимо вищеописані функції бізнес-логіки та функції налаштування для ІоТ клієнта.
+        Почнемо з функції налаштування, це окремий файл Config.h/Config.cpp, котрий містить функцію, що використовує консоль для отримання потрібних даних. Програмний код:
+
+
+#include "Config.h"
+
+
+static String readLineFromSerial(const String &prompt) {
+    Serial.println(prompt);
+    while (Serial.available() == 0) {
+        delay(10);
+    }
+
+
+    String input = Serial.readStringUntil('\n');
+    input.trim();
+
+
+    return input;
+}
+
+
+void loadConfig(Config &cfg) {
+    Serial.begin(115200);
+    Serial.println("Configuration");
+    Serial.println("Input configuration value and press Enter:");
+
+
+    cfg.username = readLineFromSerial("Username:");
+    cfg.password = readLineFromSerial("Password:");
+    cfg.location_id = readLineFromSerial("location_id:");
+    
+    {
+        String intervalStr = readLineFromSerial("measurement_interval (s):");
+        cfg.measurement_interval = intervalStr.toInt();
+    }
+    
+    cfg.server_url = readLineFromSerial("server_url (example: http://example.com):");
+    cfg.wifi_ssid = readLineFromSerial("Wi-Fi SSID:");
+    cfg.wifi_password = readLineFromSerial("Wi-Fi password:");
+
+
+    Serial.println("Configuration successful");
+}
+
+
+        Ключовою функцією є комунікація з сервером, вона реалізована в файлі Net.h/Net.cpp, де є функція підʼєднання до WiFi, яка спирається на стандартну бібліотеку для ESP32, модуля, що надає легкий доступ до мережі. Також є функція для авторизації, на основі конфігураційних даних і функція для створення записів про виміри температури та вологості, котрі реалізовані завдяки стандартній бібліотеці HTTPClient.h. Файл заголовків для цього функціоналу:
+
+
+#ifndef NETWORK_H
+#define NETWORK_H
+
+
+#include <Arduino.h>
+
+
+bool connectWiFi(const String &ssid, const String &password);
+String loginToServer(const String &username, const String &password, const String &server_url);
+bool postData(const String &token, const String &server_url, const String &location_id, float temp, float humidity);
+
+
+#endif
+
+
+        Для зчитування інформації про навколишнє середовище, було обрано датчик DHT22, котрий дозволяє легко одночасно зчитувати температуру та вологість, підключається датчик як бібліотека:
+
+
+# Wokwi Library List
+# See https://docs.wokwi.com/guides/libraries
+
+
+DHT sensor library
+
+
+Програмний код роботи з датчиком, у файлі Sensor.h/Sensor.cpp:
+#include "Sensors.h"
+#include <DHT.h>
+
+
+static DHT dhtSensor(0, DHT22);
+
+
+void initSensors(uint8_t dhtPin) {
+    dhtSensor = DHT(dhtPin, DHT22);
+    dhtSensor.begin();
+    Serial.println("DHT22 sensor initialized");
+}
+
+
+float readTemperature() {
+    float temp = dhtSensor.readTemperature();
+    if (isnan(temp)) {
+        Serial.println("Failed to read temperature!");
+        return -1.0;
+    }
+    return temp;
+}
+
+
+float readHumidity() {
+    float hum = dhtSensor.readHumidity();
+    if (isnan(hum)) {
+        Serial.println("Failed to read humidity!");
+        return -1.0;
+    }
+    return hum;
+}
+
+
+        Також є схожий файл Battery.h/Better.cpp, котрий має функції ініціалізації звукового елементу та елементу для зчитування напруги, функцію для виміру відносного заряду батареї та функцію активації звукового сигналу:
+
+
+#include "Battery.h"
+
+
+static uint8_t g_batteryPin = 0;
+static uint8_t g_buzzerPin = 0;
+
+
+void initBatteryMonitoring(uint8_t batteryPin, uint8_t buzzerPin) {
+    g_batteryPin = batteryPin;
+    g_buzzerPin = buzzerPin;
+    
+    pinMode(g_buzzerPin, OUTPUT);
+    digitalWrite(g_buzzerPin, LOW);
+
+
+    pinMode(g_batteryPin, INPUT);
+    
+    Serial.println("Battery monitoring initialized");
+}
+
+
+float readBatteryLevel() {
+    int analogVal = analogRead(g_batteryPin);
+    int batteryLevel = map(analogVal, 0, 1023, 0, 12);
+    
+    return batteryLevel;
+}
+
+
+void triggerLowBatteryAlert() {
+    Serial.println("Low battery! Alert triggered.");
+    tone(g_buzzerPin, 100, 1000);
+}
+
+
+        Останнім компонентом є головний файл, що проводить ініціалізацію модулів, авторизацію та підʼєднання до мережі та запускає циклічну перевірку значення з датчиків. Код головного файлу:
+
+
+#include "Config.h"
+#include "Net.h"
+#include "Sensors.h"
+#include "Battery.h"
+
+
+Config config;
+String authToken;
+
+
+const uint8_t DHT_PIN = 5;
+const uint8_t BATTERY_PIN = 34;
+const uint8_t BUZZER_PIN = 25;
+
+
+unsigned long lastMeasurementTime = 0;
+
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Starting IoT Client...");
+
+
+  loadConfig(config);
+
+
+  if (!connectWiFi(config.wifi_ssid, config.wifi_password)) {
+    Serial.println("Failed to connect to Wi-Fi. Restarting...");
+    delay(5000);
+    ESP.restart();
+  }
+
+
+  authToken = loginToServer(config.username, config.password, config.server_url);
+  if (authToken.isEmpty()) {
+    Serial.println("Failed to login to server. Restarting...");
+    delay(5000);
+    ESP.restart();
+  }
+
+
+  initSensors(DHT_PIN);
+  initBatteryMonitoring(BATTERY_PIN, BUZZER_PIN);
+
+
+  lastMeasurementTime = millis();
+  Serial.println("Setup complete.");
+}
+
+
+void loop() {
+  unsigned long currentTime = millis();
+
+
+  if (currentTime - lastMeasurementTime >= config.measurement_interval * 1000) {
+    lastMeasurementTime = currentTime;
+
+
+
+
+    float temperature = readTemperature();
+    float humidity = readHumidity();
+
+
+    if (!authToken.isEmpty()) {
+      bool success = postData(authToken, config.server_url, config.location_id, temperature, humidity);
+      if (!success) {
+        authToken = loginToServer(config.username, config.password, config.server_url);
+      }
+    } else {
+      authToken = loginToServer(config.username, config.password, config.server_url);
+    }
+
+
+    float batteryLevel = readBatteryLevel();
+    Serial.print("Battery level: ");
+    Serial.print(batteryLevel, 1);
+    Serial.print("\n");
+    if (batteryLevel < 20.0) {
+      triggerLowBatteryAlert();
+    }
+  }
+
+
+  delay(100);
+}
+
+
+        Емульоване середовище зображено на рисунку 3.
+
+
+  
+
+Рисунок 3 - ІоТ клієнт в емульованому середовищі
+        Фінальна версія ІоТ клієнта збережена як проєкт на емуляторі, за посиланням https://wokwi.com/projects/416695928470099969.
+
+
+6. Тестування системи
+        Записуємо змістовне відео з тестуванням бізнес-логіки та функцій конфігурування ІоТ клієнта, проставляємо таймкоди та завантажуємо на сервіс YouTube. Посилання на відео: https://youtu.be/ILzEfeqyeFU.
+________________
+ВИСНОВКИ
+
+
+        У ході виконання роботи було розроблено бізнес-логіку та функції налаштування для IoT клієнта програмної системи.
