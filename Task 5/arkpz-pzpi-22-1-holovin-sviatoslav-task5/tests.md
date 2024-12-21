@@ -1,13 +1,13 @@
 # Report generation
 
 ```bash
-curl -X GET http://localhost:3000/locations/2/report
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations/2/report
 ```
 
 # With auth
 
 ```bash
-curl -X POST http://localhost:3000/users/login \
+curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "newuser",
@@ -20,7 +20,7 @@ curl -X POST http://localhost:3000/users/login \
 # User
 
 ```bash
-curl -X POST http://localhost:3000/users \
+curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users \
   -H "Content-Type: application/json" \
   -d '{
     "username": "newuser",
@@ -30,15 +30,15 @@ curl -X POST http://localhost:3000/users \
 ```
 
 ```bash
-curl -X GET http://localhost:3000/users
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users
 ```
 
 ```bash
-curl -X GET http://localhost:3000/users/newuser
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/newuser
 ```
 
 ```bash
-curl -X PATCH http://localhost:3000/users/newuser \
+curl -X PATCH https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/newuser \
   -H "Content-Type: application/json" \
   -d '{
     "role": "manager"
@@ -46,13 +46,13 @@ curl -X PATCH http://localhost:3000/users/newuser \
 ```
 
 ```bash
-curl -X DELETE http://localhost:3000/users/newuser
+curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/newuser
 ```
 
 # Location
 
 ```bash
-curl -X POST http://localhost:3000/locations \
+curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Центральний склад",
@@ -61,15 +61,15 @@ curl -X POST http://localhost:3000/locations \
 ```
 
 ```bash
-curl -X GET http://localhost:3000/locations
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations
 ```
 
 ```bash
-curl -X GET http://localhost:3000/locations/1
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations/1
 ```
 
 ```bash
-curl -X PATCH http://localhost:3000/locations/1 \
+curl -X PATCH https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations/1 \
   -H "Content-Type: application/json" \
   -d '{
     "address": "вул. Хрещатик, 25, Київ"
@@ -77,13 +77,13 @@ curl -X PATCH http://localhost:3000/locations/1 \
 ```
 
 ```bash
-curl -X DELETE http://localhost:3000/locations/1
+curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations/1
 ```
 
 # Inventory
 
 ```bash
-curl -X POST http://localhost:3000/inventories \
+curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventories \
   -H "Content-Type: application/json" \
   -d '{
     "location_id": 1,
@@ -92,15 +92,15 @@ curl -X POST http://localhost:3000/inventories \
 ```
 
 ```bash
-curl -X GET http://localhost:3000/inventories
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventories
 ```
 
 ```bash
-curl -X GET http://localhost:3000/inventories/1
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventories/1
 ```
 
 ```bash
-curl -X PATCH http://localhost:3000/inventories/1 \
+curl -X PATCH https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventories/1 \
   -H "Content-Type: application/json" \
   -d '{
     "max_quantity": 150
@@ -108,13 +108,13 @@ curl -X PATCH http://localhost:3000/inventories/1 \
 ```
 
 ```bash
-curl -X DELETE http://localhost:3000/inventories/1
+curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventories/1
 ```
 
 # Vaccine
 
 ```bash
-curl -X POST http://localhost:3000/vaccines \
+curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/vaccines \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Вакцина проти грипу",
@@ -127,15 +127,15 @@ curl -X POST http://localhost:3000/vaccines \
 ```
 
 ```bash
-curl -X GET http://localhost:3000/vaccines
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/vaccines
 ```
 
 ```bash
-curl -X GET http://localhost:3000/vaccines/1
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/vaccines/1
 ```
 
 ```bash
-curl -X PATCH http://localhost:3000/vaccines/1 \
+curl -X PATCH https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/vaccines/1 \
   -H "Content-Type: application/json" \
   -d '{
     "description": "Оновлений опис вакцини проти грипу"
@@ -143,13 +143,13 @@ curl -X PATCH http://localhost:3000/vaccines/1 \
 ```
 
 ```bash
-curl -X DELETE http://localhost:3000/vaccines/1
+curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/vaccines/1
 ```
 
 # InventoryItem
 
 ```bash
-curl -X POST http://localhost:3000/inventoryItems \
+curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventoryItems \
   -H "Content-Type: application/json" \
   -d '{
     "inventory_id": 1,
@@ -159,15 +159,15 @@ curl -X POST http://localhost:3000/inventoryItems \
 ```
 
 ```bash
-curl -X GET http://localhost:3000/inventoryItems
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventoryItems
 ```
 
 ```bash
-curl -X GET http://localhost:3000/inventoryItems/1
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventoryItems/1
 ```
 
 ```bash
-curl -X PATCH http://localhost:3000/inventoryItems/1 \
+curl -X PATCH https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventoryItems/1 \
   -H "Content-Type: application/json" \
   -d '{
     "quantity": 60
@@ -175,13 +175,13 @@ curl -X PATCH http://localhost:3000/inventoryItems/1 \
 ```
 
 ```bash
-curl -X DELETE http://localhost:3000/inventoryItems/1
+curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventoryItems/1
 ```
 
 # Order
 
 ```bash
-curl -X POST http://localhost:3000/orders \
+curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/orders \
   -H "Content-Type: application/json" \
   -d '{
     "username": "newuser",
@@ -196,15 +196,15 @@ curl -X POST http://localhost:3000/orders \
 ```
 
 ```bash
-curl -X GET http://localhost:3000/orders
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/orders
 ```
 
 ```bash
-curl -X GET http://localhost:3000/orders/1
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/orders/1
 ```
 
 ```bash
-curl -X PATCH http://localhost:3000/orders/1 \
+curl -X PATCH https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/orders/1 \
   -H "Content-Type: application/json" \
   -d '{
     "order_status": "completed",
@@ -218,13 +218,13 @@ curl -X PATCH http://localhost:3000/orders/1 \
 ```
 
 ```bash
-curl -X DELETE http://localhost:3000/orders/1
+curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/orders/1
 ```
 
 # SensorData
 
 ```bash
-curl -X POST http://localhost:3000/sensorData \
+curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/sensorData \
   -H "Content-Type: application/json" \
   -d '{
     "location_id": 1,
@@ -234,17 +234,17 @@ curl -X POST http://localhost:3000/sensorData \
 ```
 
 ```bash
-curl -X GET http://localhost:3000/sensorData
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/sensorData
 ```
 
 ```bash
-curl -X GET http://localhost:3000/sensorData/1
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/sensorData/1
 ```
 
 # Notification
 
 ```bash
-curl -X POST http://localhost:3000/notifications \
+curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/notifications \
   -H "Content-Type: application/json" \
   -d '{
     "username": "newuser",
@@ -254,9 +254,9 @@ curl -X POST http://localhost:3000/notifications \
 ```
 
 ```bash
-curl -X GET http://localhost:3000/notifications
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/notifications
 ```
 
 ```bash
-curl -X GET http://localhost:3000/notifications/1
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/notifications/1
 ```
