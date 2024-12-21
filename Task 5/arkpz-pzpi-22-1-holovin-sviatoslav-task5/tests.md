@@ -10,8 +10,8 @@ curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations/2/
 curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/login \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "newuser",
-    "password": "password"
+    "username": "admin",
+    "password": "admin"
   }'
 ```
 
@@ -23,9 +23,9 @@ curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/login
 curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "newuser",
+    "username": "admin",
     "role": "admin",
-    "password": "password"
+    "password": "admin"
   }'
 ```
 
