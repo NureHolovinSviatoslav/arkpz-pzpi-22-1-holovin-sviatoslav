@@ -12,13 +12,7 @@ const Notification = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    username: {
-      type: Sequelize.STRING,
-      references: {
-        model: User,
-        key: 'username',
-      },
-    },
+    phone: Sequelize.STRING,
     sent_at: {
       type: Sequelize.DATE,
       defaultValue: Sequelize.NOW,
@@ -31,9 +25,6 @@ const Notification = sequelize.define(
     timestamps: false,
   },
 );
-
-Notification.belongsTo(User, { foreignKey: 'username', onDelete: 'CASCADE' });
-User.hasMany(Notification, { foreignKey: 'username', onDelete: 'CASCADE' });
 
 module.exports = {
   Notification,

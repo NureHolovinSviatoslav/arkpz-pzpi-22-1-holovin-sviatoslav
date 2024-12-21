@@ -99,7 +99,7 @@ const update = async (req, res) => {
 
     const error = await checkInventoryItems(item.inventory_item_id);
     if (error) {
-      sendSms(formatOutOfStockMessage(error));
+      sendSms(formatOutOfStockMessage(error), 'warning');
     }
 
     res.send(item);

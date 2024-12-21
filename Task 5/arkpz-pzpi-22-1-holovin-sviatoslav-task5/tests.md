@@ -1,7 +1,8 @@
 # Report generation
 
 ```bash
-curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations/2/report
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations/2/report \
+  -H "Authorization: BEARER "
 ```
 
 # With auth
@@ -22,6 +23,7 @@ curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/login
 ```bash
 curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users \
   -H "Content-Type: application/json" \
+  -H "Authorization: BEARER " \
   -d '{
     "username": "admin",
     "role": "admin",
@@ -30,23 +32,27 @@ curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users \
 ```
 
 ```bash
-curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users \
+  -H "Authorization: BEARER "
 ```
 
 ```bash
-curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/newuser
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/newuser \
+   -H "Authorization : BEARER "
 ```
 
 ```bash
 curl -X PATCH https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/newuser \
   -H "Content-Type: application/json" \
+  -H "Authorization: BEARER " \
   -d '{
     "role": "manager"
   }'
 ```
 
 ```bash
-curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/newuser
+curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/users/newuser \
+   -H "Authorization: BEARER "
 ```
 
 # Location
@@ -61,7 +67,9 @@ curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations \
 ```
 
 ```bash
-curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations
+curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations \
+  -H "Authorization: BEARER "
+
 ```
 
 ```bash
@@ -85,6 +93,7 @@ curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/locations
 ```bash
 curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventories \
   -H "Content-Type: application/json" \
+  -H "Authorization: BEARER " \
   -d '{
     "location_id": 1,
     "max_quantity": 100
@@ -116,6 +125,7 @@ curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventori
 ```bash
 curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/vaccines \
   -H "Content-Type: application/json" \
+  -H "Authorization: BEARER " \
   -d '{
     "name": "Вакцина проти грипу",
     "description": "Щорічна вакцинація від грипу",
@@ -151,6 +161,7 @@ curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/vaccines/
 ```bash
 curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventoryItems \
   -H "Content-Type: application/json" \
+  -H "Authorization: BEARER " \
   -d '{
     "inventory_id": 1,
     "vaccine_id": 1,
@@ -183,6 +194,7 @@ curl -X DELETE https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/inventory
 ```bash
 curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/orders \
   -H "Content-Type: application/json" \
+  -H "Authorization: BEARER " \
   -d '{
     "username": "newuser",
     "order_status": "pending",
@@ -247,7 +259,7 @@ curl -X GET https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/sensorData/1
 curl -X POST https://arkpz-pzpi-22-1-holovin-sviatoslav.onrender.com/notifications \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "newuser",
+    "phone": "+380123456789",
     "message": "Температура перевищила допустимий рівень",
     "notification_type": "warning"
   }'

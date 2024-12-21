@@ -80,7 +80,6 @@ const remove = async (req, res) => {
   const { username } = req.params;
 
   try {
-    await Notification.destroy({ where: { username } });
     await Order.destroy({ where: { username } });
     const deleted = await User.destroy({
       where: { username },

@@ -40,7 +40,7 @@ const add = async (req, res) => {
 
     const error = await checkSensorData(sensorData.sensor_data_id);
     if (error) {
-      sendSms(formatAlertMessage(error));
+      sendSms(formatAlertMessage(error), 'alert');
     }
 
     res.status(201).send(sensorData);
