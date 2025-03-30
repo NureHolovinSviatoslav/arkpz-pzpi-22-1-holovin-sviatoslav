@@ -23,7 +23,7 @@ const processSending = async (objs) => {
 
 З повагою, Ваше ритуальне агенство)`;
     // const phone = obj.phone;
-    const phone = '+380689172236';
+    const phone = '+';
 
     await clientTwilio.messages.create({
       body: msg,
